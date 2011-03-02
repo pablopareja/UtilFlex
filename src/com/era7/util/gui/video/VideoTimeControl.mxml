@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" horizontalGap="0"
+	horizontalScrollPolicy="off" verticalScrollPolicy="off">
+	<mx:Script>
+		<![CDATA[
+			
+			
+			
+			public function setTotalTime(seconds:Number):void{
+				
+				var minutes:int = Math.floor(seconds / 60);
+				var rest:int = seconds - (minutes * 60);
+				
+				if(rest <= 9){
+					totalTimeLabel.text = minutes + ":0" + rest;
+				}else{
+					totalTimeLabel.text = minutes + ":" + rest;
+				}			
+				
+			}
+			
+			public function setTimeElapsed(seconds:Number):void{
+				
+				var minutes:int = Math.floor(seconds / 60);
+				var rest:int = seconds - (minutes * 60);
+				
+				if(rest <= 9){
+					timeElapsedLabel.text = minutes + ":0" + rest;
+				}else{
+					timeElapsedLabel.text = minutes + ":" + rest;
+				}
+				
+				
+			}
+			
+			
+		]]>
+	</mx:Script>
+	<mx:Label alpha="{this.alpha}" id="timeElapsedLabel" text="0:00"/>
+	<mx:Label alpha="{this.alpha}" text="/" width="10"/>
+	<mx:Label alpha="{this.alpha}" text="0:00" id="totalTimeLabel"/>
+</mx:HBox>

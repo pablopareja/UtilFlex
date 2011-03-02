@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" 
+	verticalAlign="middle" horizontalGap="1">
+	<mx:states>
+		<mx:State name="EditableState">
+			<mx:RemoveChild target="{phoneLabel}"/>
+			<mx:AddChild position="lastChild">
+				<mx:TextInput id="phoneTextInput" text="{this.phone}" width="100%"
+					 change="onTextInputChange()" />
+			</mx:AddChild>
+			<mx:RemoveChild target="{countryCodeLabel}"/>
+			<mx:AddChild relativeTo="{phoneTextInput}" position="before">
+				<mx:TextInput id="countryCodeTextInput" text="{this.countryCode}" editable="false" 
+					enabled="true" width="25" change="onTextInputChange()"/>
+			</mx:AddChild>
+		</mx:State>
+	</mx:states>
+	<mx:Script>
+		<![CDATA[
+			
+			
+			[Bindable]
+			protected var countryCode:String = "34";			
+			[Bindable]
+			protected var phone:String = "";
+			
+			
+			private function onTextInputChange():void{
+				this.dispatchEvent(new Event(Event.CHANGE,true));
+			}			
+			
+			
+			/**
+			 * 	Set country code
+			 */
+			public function setCountryCode(value:String):void{
+				this.countryCode = value;
+			}
+			/**
+			 *  Get country code
+			 */
+			public function getCountryCode():String{
+				return this.countryCode;
+			}
+			
+			/**
+			 * 	Set phone
+			 */
+			public function setPhone(value:String):void{
+				this.phone = value;
+			}
+			/**
+			 *  Get phone
+			 */
+			public function getPhone():String{
+				if(this.currentState == "EditableState"){
+					return this.phoneTextInput.text;
+				}else{
+					return this.phone;
+				}			
+			}
+					
+			
+			/**
+			 * 	Set editable
+			 */
+			public function setEditable(b:Boolean):void{
+				if(b){
+					this.currentState = "EditableState";
+				}else{
+					this.currentState = "";
+				}
+			}
+			
+		]]>
+	</mx:Script>
+	<mx:Label text="{this.countryCode}" id="countryCodeLabel" selectable="true" width="20"/>
+	<mx:Label text="{this.phone}" id="phoneLabel" width="100%" selectable="true"/>
+	
+</mx:HBox>

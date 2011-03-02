@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" verticalAlign="middle" horizontalAlign="left" 
+	horizontalGap="1" paddingRight="3" paddingLeft="3" paddingBottom="3" paddingTop="3" 
+	horizontalScrollPolicy="off" verticalScrollPolicy="off" >
+	<mx:states>
+		<mx:State name="MutedState">
+			<mx:SetProperty target="{speakerButton}" name="source" value="{muteIcon}"/>
+		</mx:State>
+	</mx:states>
+	<mx:Script>
+		<![CDATA[
+			import com.era7.util.events.VolumeControlEvent;
+			
+			
+			//--------------ICONS-------------------
+			[Bindable]
+			public var speakerIcon:Class = null;
+			[Bindable]
+			public var muteIcon:Class = null;			
+			[Bindable]
+			public var thumbIcon:Class = null;
+			//-----------------------------------------
+							
+			
+			//----------------------STATES-----------------------
+			public const BASE_STATE:String = "";	
+			public const MUTED_STATE:String = "MutedState";
+			
+			public const DEFAULT_TRACK_WIDTH:Number = 65;
+			
+			[Bindable]
+			public var trackWidth:Number = DEFAULT_TRACK_WIDTH;		
+						
+			
+			protected function onSpeakerButtonClick():void{		
+						
+				if(currentState == MUTED_STATE){		
+					
+					dispatchEvent(new VolumeControlEvent(VolumeControlEvent.VOLUME_ACTIVATED,volumeSlider.value,true));	
+					currentState = BASE_STATE;
+					
+				}else{
+					
+					dispatchEvent(new VolumeControlEvent(VolumeControlEvent.MUTED,0,true));
+					currentState = MUTED_STATE;
+					
+				}
+			}			
+			
+			protected function onVolumeSliderChange():void{
+				if(volumeSlider.value == 0){
+					dispatchEvent(new VolumeControlEvent(VolumeControlEvent.MUTED,0,true));
+					currentState = MUTED_STATE;
+				}else{
+					
+					if(currentState == MUTED_STATE){
+						dispatchEvent(new VolumeControlEvent(VolumeControlEvent.VOLUME_ACTIVATED,volumeSlider.value,true));	
+						currentState = BASE_STATE;
+					}else{
+						dispatchEvent(new VolumeControlEvent(VolumeControlEvent.VOLUME_CHANGED,volumeSlider.value,true));
+					}
+				}
+				
+			}
+			
+			public function setVolume(value:Number):void{
+				volumeSlider.value = value;
+			}
+			public function getVolume():Number{
+				return volumeSlider.value;
+			}
+			
+			
+			
+		]]>
+	</mx:Script>
+	<mx:SWFLoader id="speakerButton" source="{speakerIcon}"
+		click="onSpeakerButtonClick()"/>
+	<mx:HSlider id="volumeSlider" enabled="true" liveDragging="true" 
+		minimum="0" maximum="1" snapInterval="0.05" change="onVolumeSliderChange()"
+		showTrackHighlight="true" visible="true" thumbSkin="{thumbIcon}" allowTrackClick="true" 
+		width="{trackWidth}"/>	
+</mx:HBox>

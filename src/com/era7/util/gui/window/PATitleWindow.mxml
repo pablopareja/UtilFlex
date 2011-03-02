@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResizableTitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" 
+	xmlns="com.era7.util.gui.window.*"
+	width="400" height="300" showCloseButton="true" close="onClose()" 
+	creationComplete="onCreationComplete()" verticalScrollPolicy="off" 
+	horizontalScrollPolicy="off">	
+	<mx:Script>
+		<![CDATA[
+			
+			
+			/**
+			 * 	On creation complete
+			 */
+			private function onCreationComplete():void{
+				//this.width = this.width;
+				//this.height = this.height;
+			}
+			
+			
+			/**
+			 * 	On close
+			 */
+			private function onClose():void{
+				this.visible = false;
+			}
+		]]>
+	</mx:Script>
+</ResizableTitleWindow>

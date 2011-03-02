@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:DataGrid xmlns:mx="http://www.adobe.com/2006/mxml" >
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			
+					
+			[Bindable]
+			protected var tagName:String = "";
+						
+			
+			/**
+			 * 	Deletes the selected item
+			 *  @return Null if there is no item selected, the removed item otherwise
+			 */
+			protected function deleteSelectedItem():XML{
+				if(selectedItem != null){
+					var temp:XML = XML(XMLList(dataProvider)[selectedIndex]).copy();
+					Alert.show("temp: " + temp.toXMLString());
+					delete XMLList(dataProvider)[selectedIndex];		
+					validateNow();			
+					return temp;
+				}else{
+					return null;
+				}
+			}
+			/**
+			 * 	Moves up one position the selected item 
+			 */
+			protected function raiseSelectedItem():void{
+            	if(selectedItem != null && selectedIndex > 0){
+            		var index:int = selectedIndex;
+            		var temp:XML = XML(selectedItem).copy();
+            		XMLList(dataProvider)[index] = XML(XMLList(dataProvider)[index-1]).copy();
+            		XMLList(dataProvider)[index-1] = temp;
+            	}         	
+            }
+            /**
+			 * 	Moves down one position the selected item 
+			 */
+            protected function lowerSelectedItem():void{
+            	if(selectedItem != null && selectedIndex < (XMLList(dataProvider).length() - 1)){
+            		var index:int = selectedIndex;
+            		var temp:XML = XML(selectedItem).copy();
+            		XMLList(dataProvider)[index] = XML(XMLList(dataProvider)[index+1]).copy();
+            		XMLList(dataProvider)[index+1] = temp;
+            	}  
+            	
+            }
+			
+			
+			
+		]]>
+	</mx:Script>
+</mx:DataGrid>

@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" 
+	creationComplete="onCreationComplete()" horizontalScrollPolicy="off" verticalScrollPolicy="off" 
+	implements="com.era7.util.interfaces.lang.ISpanish, com.era7.util.interfaces.lang.IEnglish" 
+	verticalAlign="middle" horizontalGap="2" xmlns:ns1="com.era7.util.time.*" verticalGap="5">
+	<mx:states>		
+		<mx:State name="UploadCompletedState">
+			<mx:SetStyle target="{hbox1}" name="verticalAlign" value="middle"/>
+			<mx:AddChild relativeTo="{fileValue}" position="before">
+				<mx:Label text="Completado:" fontWeight="bold" color="#008000" 
+					id="completedLabel"/>
+			</mx:AddChild>
+			<mx:RemoveChild target="{uploadingLabel}"/>
+			<mx:RemoveChild target="{swfloader1}"/>
+		</mx:State>
+		<mx:State name="TimeElapsedState">
+			<mx:AddChild position="lastChild">
+				<mx:HBox width="100%" height="60" id="hbox2">
+					<mx:Text text="El tiempo estimado para la subida ha sido superado. &#xa;Es posible que la velocidad de subida de su conexión sea limitada, &#xa;compruebe que dispone de conexión a internet y manténgase a la espera o &#xa;cancele la subida del fichero presionando el botón 'Cancelar'." fontWeight="normal" color="#4F8894" height="60" width="100%" fontStyle="italic"/>
+				</mx:HBox>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:HBox width="100%" verticalAlign="bottom" horizontalAlign="right" paddingRight="10">
+					<mx:Button label="Cancelar subida" id="cancelUploadButton" click="onCancelUploadButtonClick()"/>
+				</mx:HBox>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="ErrorState">
+			<mx:SetProperty target="{uploadingLabel}" name="text" value="Error"/>
+			<mx:SetStyle target="{uploadingLabel}" name="color" value="#FF0000"/>
+		</mx:State>
+	</mx:states>
+	<mx:XML id="languagesXML" source="../../../../../../../lang/ProgressComponent.xml" format="e4x"/>
+	<mx:Script>
+		<![CDATA[
+			import com.era7.util.events.CancelEvent;
+			import com.era7.util.time.TimerDisplayEvent;
+		
+			private const unit:String = " KB";
+			
+			//----------LANGUAGE VARS------------------
+			protected var language:String = "";
+			[Bindable] 
+			protected var currentLanguage:XML = new XML();
+			//--------------------------------------------
+            
+			protected const MIN_TIME:Number = 10000;
+			
+			//----------------------------STATES------------------------------------
+			public const BASE_STATE:String = "";
+			public const UPLOAD_COMPLETED_STATE:String = "UploadCompletedState";
+			public const ERROR_STATE:String = "ErrorState";
+			public const TIME_ELAPSED_STATE:String = "TimeElapsedState";
+			//----------------------------------------------------------------------
+			
+			/**
+			 * 	On creation complete
+			 */
+			private function onCreationComplete():void{
+				this.setSpanishValues();
+				
+				this.timerDisplay.addEventListener(TimerDisplayEvent.TIME_ELAPSED,onTimeElapsed);
+			}
+			
+			//----------------------------------------------------------------------------------
+			//-----------------------------LANGUAGE FUNCTIONS-----------------------------------
+			//----------------------------------------------------------------------------------
+			/**
+			 * 	Set English values
+			 */			
+			public function setEnglishValues():void{
+				this.language = "English";
+				this.currentLanguage = this.languagesXML.english[0];			 
+			}
+			/**
+			 * 	Set Spanish values
+			 */	
+			public function setSpanishValues():void{
+				this.language = "Spanish";
+				this.currentLanguage = this.languagesXML.spanish[0];
+				
+			}
+			/**
+			 * 	Set language
+			 */
+			public function setLanguage(lang:String):void{
+				this.language = lang;
+			}
+			/**
+			 * 	Get language
+			 */
+			public function getLanguage():String{
+				return this.language;
+			}			
+			//----------------------------------------------------------------------------------
+			//----------------------------------------------------------------------------------
+						
+			/**
+			 * 	On time elapsed
+			 */
+			private function onTimeElapsed(event:TimerDisplayEvent):void{
+				if(this.currentState != UPLOAD_COMPLETED_STATE){
+					this.currentState = TIME_ELAPSED_STATE;
+				}				
+			}
+			/**
+			 * 	On cancel upload button click
+			 */
+			private function onCancelUploadButtonClick():void{
+				this.dispatchEvent(new CancelEvent(CancelEvent.CANCEL_PRESSED,true));
+			}
+			public function setTotalValue(value:String):void{
+				this.totalValue.text = value + this.unit;
+			}
+			
+			public function setFileValue(value:String):void{
+				this.fileValue.text = value;
+			}		
+			/**
+			 * 	@value Estimated time in milliseconds
+			 */
+			public function setEstimatedTime(value:Number):void{
+				
+				this.timerDisplay.setTimerLimit(value+this.MIN_TIME);
+				
+				var timeLeft:Number = value/1000;
+				
+				var hours:Number = Math.floor(timeLeft/60/24);
+				this.estimatedHours.text = hours.toString();
+				timeLeft -= (hours*60*24);
+				
+				var minutes:Number = Math.floor(timeLeft/60);				
+				this.estimatedMinutes.text = minutes.toString();
+				timeLeft -= (minutes*60);
+				
+				var seconds:Number = Math.floor(timeLeft);
+				this.estimatedSeconds.text = seconds.toString();
+				
+				if(hours == 0 && minutes == 0 && seconds == 0){
+					this.estimatedSeconds.text = "1";
+				} 
+			}	
+			
+			/**
+			 * 	Start timer
+			 */
+			public function startTimer():void{
+				this.timerDisplay.startTimer();
+			}
+			
+			public function setUploadCompleted():void{
+				this.currentState = UPLOAD_COMPLETED_STATE;
+				this.timerDisplay.stopTimer();
+			}
+			public function setErrorState():void{
+				this.timerDisplay.stopTimer();
+				this.currentState = ERROR_STATE;
+			}
+			
+			public function init():void{
+				this.currentState = BASE_STATE;
+				this.timerDisplay.init();
+			}
+			
+			
+		]]>
+	</mx:Script>
+	<mx:HBox id="hbox1"  height="20" verticalAlign="middle" horizontalScrollPolicy="off" 
+		verticalScrollPolicy="off" width="100%">
+		<mx:Label text="Subiendo:" fontWeight="bold" color="#3F81BE" 
+					id="uploadingLabel"/>
+		<mx:Label id="fileValue" />
+		<!--
+		<mx:Label id="downloadedValue" />
+		<mx:Label id="slashLabel" text="/" width="10" visible="false"/>
+		-->
+		<mx:Label id="totalValue"/>	
+		<mx:SWFLoader scaleContent="true" height="20" 
+			source="@Embed('../../../../../../../icons/uploadingAnimation.swf')" id="swfloader1"/>
+	</mx:HBox>
+	<mx:VBox verticalGap="0" width="100%" horizontalAlign="right" borderStyle="solid" backgroundColor="#F5F5F5" 
+		cornerRadius="5" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+		<mx:HBox horizontalGap="0" width="100%" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+			<mx:Label x="0" y="2" text="Tiempo estimado de subida:" fontWeight="bold"/>
+			<mx:Label id="estimatedHours" fontWeight="normal"/>
+			<mx:Label text="h"/>
+			<mx:Label id="estimatedMinutes"/>
+			<mx:Label text="m"/>
+			<mx:Label id="estimatedSeconds"/>
+			<mx:Label text="s"/>
+		</mx:HBox>
+		<mx:Label text="(para una velocidad de subida de 128Kb/s)" fontStyle="italic" width="100%"/>
+	</mx:VBox>
+	<mx:HBox width="100%" borderStyle="solid" backgroundColor="#F1EDED" verticalScrollPolicy="off" 
+		horizontalScrollPolicy="off">
+		<mx:Label text="Tiempo transcurrido:" fontWeight="bold"/>
+		<ns1:TimerDisplay id="timerDisplay">
+		</ns1:TimerDisplay>
+	</mx:HBox>
+</mx:VBox>

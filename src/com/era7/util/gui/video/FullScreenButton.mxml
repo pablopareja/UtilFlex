@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:SWFLoader xmlns:mx="http://www.adobe.com/2006/mxml" click="onbuttonClick()" 
+	source="{goFullScreenIcon}" toolTip="Ver en pantalla completa" >
+	<mx:states>
+		<mx:State name="FullScreenState">
+			<mx:SetProperty target="{this}" name="source" value="{goBackNormalIcon}"/>
+			<mx:SetProperty target="{this}" name="toolTip" value="Ver en tamaño normal"/>
+		</mx:State>
+	</mx:states>	
+	<mx:Script>
+		<![CDATA[
+			import com.era7.util.events.FullScreenButtonEvent;
+			
+			
+			//-----------------STATES----------------
+			public static const FULL_SCREEN_STATE:String = "FullScreenState";
+			public static const BASE_STATE:String = "";
+			
+			[Bindable]
+			//[Embed(source="../../../../../../icons/fullscreen.swf")]
+			protected var goFullScreenIcon:Class;
+			[Bindable]
+			//[Embed(source="../../../../../../icons/restore.swf")]
+			protected var goBackNormalIcon:Class;
+						
+			
+			protected function onbuttonClick():void{
+				if(currentState == FULL_SCREEN_STATE){
+					dispatchEvent(new FullScreenButtonEvent(FullScreenButtonEvent.GO_BACK_NORMAL,true));					
+					currentState = BASE_STATE;					
+				}else{
+					dispatchEvent(new FullScreenButtonEvent(FullScreenButtonEvent.GO_FULL_SCREEN,true));
+					currentState = FULL_SCREEN_STATE;
+				}
+			}
+			
+		]]>
+	</mx:Script>
+</mx:SWFLoader>

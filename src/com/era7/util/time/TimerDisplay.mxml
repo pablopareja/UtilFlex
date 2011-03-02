@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="onCreationComplete()"
+	 verticalScrollPolicy="off" horizontalScrollPolicy="off">
+	<mx:Label id="timerLabel"/>
+	<mx:DateFormatter id="dateFormatter" formatString="NN:SS" />
+	<mx:Script>
+		<![CDATA[
+			
+			protected var MIN_MASK:String = "00";
+            protected var SEC_MASK:String = "00";
+            protected var TIMER_INTERVAL:int = 1000;
+            protected var TIMER_LIMIT:Number = 100000;
+           	
+           	protected var counter:int = 0;
+
+            private var baseTimer:int;
+
+            private var t:Timer;
+            
+            /**
+            * 	On creation complete
+            */
+            private function onCreationComplete():void {
+                t = new Timer(TIMER_INTERVAL);
+                t.addEventListener(TimerEvent.TIMER, updateTimer);
+            }
+            /**
+            * 	Update timer
+            */
+            private function updateTimer(evt:TimerEvent):void {
+                var d:Date = new Date(getTimer() - baseTimer);
+                timerLabel.text = dateFormatter.format(d);
+                
+                counter += this.TIMER_INTERVAL;
+                if(counter >= this.TIMER_LIMIT){
+                	this.stopTimer();
+                	this.dispatchEvent(new TimerDisplayEvent(TimerDisplayEvent.TIME_ELAPSED,true));
+                }else{
+                	this.t.reset();
+                	this.t.start();
+                }
+                
+            }
+            
+            public function init():void{
+            	t = new Timer(TIMER_INTERVAL);
+                t.addEventListener(TimerEvent.TIMER, updateTimer);
+                this.counter = 0;
+            }
+
+            public function startTimer():void {
+                baseTimer = getTimer();
+                t.reset();
+                t.start();
+            }
+
+            public function stopTimer():void {
+                t.stop();
+            }
+
+            
+            /**
+            * 	Set timer limit
+            */
+           	public function setTimerLimit(value:Number):void{
+           		this.TIMER_LIMIT = value;
+           	}
+
+		]]>
+	</mx:Script>
+</mx:HBox>

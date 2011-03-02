@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="{this.progressComponent.width + 25}" 
+	height="{this.progressComponent.height + 50}"  
+	creationComplete="onCreationComplete()" xmlns="com.era7.util.gui.window.*"
+	title="In progress..." close="closeWindow()" showCloseButton="false" 
+	backgroundAlpha="1.0" alpha="1.0" currentState=""
+	implements="com.era7.util.interfaces.lang.ISpanish, com.era7.util.interfaces.lang.IEnglish" 
+	xmlns:progress="com.era7.util.gui.window.progress.*" horizontalScrollPolicy="off" 
+	verticalScrollPolicy="off" headerHeight="25" verticalAlign="middle" horizontalAlign="center">
+	<mx:XML id="languagesXML" source="../../../../../../../lang/ProgressTitleWindow.xml" format="e4x"/>	
+	<mx:states>	
+		<mx:State name="ProgressCompletedState" enterState="onProgressCompletedEnterState()">			
+			<mx:SetProperty name="showCloseButton" value="true"/>
+			<mx:SetStyle name="headerColors" value="[#008000,#8ddd8d]"/>
+		</mx:State>
+		<mx:State name="ErrorState">
+			<mx:SetProperty name="title" value="Error..."/>
+			<mx:SetStyle name="headerColors" value="[#fe623e,#fe623e]"/>
+			<mx:SetProperty name="showCloseButton" value="true"/>
+		</mx:State>
+	</mx:states>
+	<mx:Script>
+		<![CDATA[		
+		
+			import mx.managers.PopUpManager;
+			
+			protected var language:String = "";
+			[Bindable] 
+			protected var currentLanguage:XML = new XML();
+			
+			//----------------------------STATES------------------------------------
+			public const BASE_STATE:String = "";
+			public const PROGRESS_COMPLETED_STATE:String = "ProgressCompletedState";
+			public const ERROR_STATE:String = "ErrorState";
+			//----------------------------------------------------------------------
+			
+			/**
+			*	On creation complete
+			*/
+			private function onCreationComplete():void{
+				this.setSpanishValues();		
+				//this.progressComponent.setDownloading();
+			}
+			
+			//----------------------------------------------------------------------------------
+			//-----------------------------LANGUAGE FUNCTIONS-----------------------------------
+			//----------------------------------------------------------------------------------
+			/**
+			 * 	Set English values
+			 */			
+			public function setEnglishValues():void{
+				this.language = "English";	
+				this.currentLanguage = this.languagesXML.english[0];		
+				this.progressComponent.setEnglishValues();	
+				this.title = "In progress...";
+			}
+			/**
+			 * 	Set Spanish values
+			 */	
+			public function setSpanishValues():void{
+				this.language = "Spanish";
+				this.currentLanguage = this.languagesXML.english[0];		
+				this.progressComponent.setSpanishValues();
+				this.title = "En curso...";
+			}
+			private function onProgressCompletedEnterState():void{
+				if(this.language == "English"){
+					this.title = "Progress completed";
+				}else if(this.language == "Spanish"){
+					this.title = "Proceso completado";
+				}
+			}
+			/**
+			 * 	Set language
+			 */
+			public function setLanguage(lang:String):void{
+				this.language = lang;
+			}
+			/**
+			 * 	Get language
+			 */
+			public function getLanguage():String{
+				return this.language;
+			}						
+			//----------------------------------------------------------------------------------
+			//----------------------------------------------------------------------------------
+			
+			/**
+			 * 	Close window
+			 */
+			private function closeWindow():void{
+				this.visible = false;
+			}
+			
+			
+			public function setFileName(value:String):void{
+				this.progressComponent.setFileValue(value);
+			}
+			
+			public function setFileSize(value:String):void{
+				this.progressComponent.setTotalValue(value);
+			}	
+			
+			public function setEstimatedTime(value:Number):void{
+				this.progressComponent.setEstimatedTime(value);
+			}
+			public function startTimer():void{
+				this.progressComponent.startTimer();
+			}
+			public function setUploadCompleted():void{
+				this.currentState = PROGRESS_COMPLETED_STATE;
+				this.progressComponent.setUploadCompleted();	
+				
+				//this.showCloseButton = true;			
+			}
+			public function setErrorState():void{
+				this.currentState = ERROR_STATE;
+				this.progressComponent.setErrorState();
+			}
+			public function init():void{
+				this.title = "En curso...";
+				this.currentState = "";
+				this.progressComponent.init();
+			}
+			
+			
+			
+		]]>
+	</mx:Script>
+	<progress:ProgressComponent id="progressComponent" 
+		verticalScrollPolicy="off" horizontalScrollPolicy="off" width="500" horizontalCenter="0" 
+		verticalCenter="0">
+	</progress:ProgressComponent>	
+</mx:TitleWindow>

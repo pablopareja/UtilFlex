@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="300" height="178"
+	verticalAlign="middle" horizontalAlign="center" cornerRadius="10" borderColor="#79bcff"
+	implements="com.era7.util.interfaces.lang.ISpanish, com.era7.util.interfaces.lang.IEnglish"
+	creationComplete="onCreationComplete()">
+	<mx:XML id="languagesXML" source="../../../../../../lang/ConfirmationPopUp.xml" format="e4x"/>
+	<mx:Script>
+		<![CDATA[
+			import com.era7.util.events.*;
+			import mx.managers.PopUpManager;
+		
+			[Bindable]
+			public var text:String="";
+			
+			public var parentComponent:TitleWindow;
+			
+			protected var language:String = "";
+			[Bindable] 
+			protected var currentLanguage:XML = new XML();
+			
+			/**
+			 * 	On creation complete
+			 */
+			private function onCreationComplete():void{
+				this.setSpanishValues();
+			}
+			
+			//----------------------------------------------------------------------------------
+			//-----------------------------LANGUAGE FUNCTIONS-----------------------------------
+			//----------------------------------------------------------------------------------
+			/**
+			 * 	Set English values
+			 */			
+			public function setEnglishValues():void{
+				this.language = "English";
+				this.currentLanguage = this.languagesXML.english[0];
+							 
+			}
+			/**
+			 * 	Set Spanish values
+			 */	
+			public function setSpanishValues():void{
+				this.language = "Spanish";
+				this.currentLanguage = this.languagesXML.english[0];							
+			}
+			/**
+			 * 	Set language
+			 */
+			public function setLanguage(lang:String):void{
+				this.language = lang;
+			}
+			/**
+			 * 	Get language
+			 */
+			public function getLanguage():String{
+				return this.language;
+			}			
+			//----------------------------------------------------------------------------------
+			//----------------------------------------------------------------------------------
+			
+			private function okPressed():void{
+				//this.dispatchEvent(new OKEvent(OKEvent.OK_PRESSED,true));
+				PopUpManager.removePopUp(parentComponent);
+				PopUpManager.removePopUp(this);
+				
+			}
+			
+			private function cancelPressed():void{
+				this.dispatchEvent(new CancelEvent(CancelEvent.CANCEL_PRESSED,true));
+				PopUpManager.removePopUp(this);
+			}
+		]]>
+	</mx:Script>
+	<mx:Label horizontalCenter="0" top="38" id="textLabel" text="{this.text}"/>
+	<mx:SWFLoader source="@Embed('../../../../../../icons/ayuda.swf')" width="55" height="58" 
+		left="31" top="23"/>
+	<mx:HBox left="10" right="10" bottom="0" verticalAlign="middle" horizontalAlign="right" 
+		horizontalGap="10">
+		<mx:Button label="{this.currentLanguage.buttons.cancel.label}" id="cancelButton" 
+			click="cancelPressed()"/>
+		<mx:Button label="{this.currentLanguage.buttons.ok.label}" id="okButton" 
+			click="okPressed()"/>
+	</mx:HBox>
+</mx:TitleWindow>

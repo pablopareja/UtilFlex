@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	@author Pablo Pareja Tobes
+	@see com.era7.util.event.PaginationControlEvent
+-->
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" horizontalGap="5" horizontalAlign="right" 
+	verticalAlign="middle" creationComplete="onCreationComplete()" paddingTop="3" 
+	paddingRight="3" paddingLeft="3" paddingBottom="3"
+	implements="com.era7.util.interfaces.lang.ISpanish, com.era7.util.interfaces.lang.IEnglish" >
+	<mx:XML id="languagesXML" source="../../../../../lang/PaginationControl.xml" format="e4x"/>
+	<mx:Script>
+		<![CDATA[
+			import com.era7.util.debug.Debugger;
+			import com.era7.util.events.PaginationControlEvent;
+			
+			
+			
+			protected var currentPage:Number = 1;
+			protected var numberOfPages:Number = 1;
+			
+			[Bindable]
+			[Embed(source="../../../../../icons/firstPage.png")]
+			protected var firstPageIcon:Class;
+			
+			[Bindable]
+			[Embed(source="../../../../../icons/lastPage.png")]
+			protected var lastPageIcon:Class;
+			
+			[Bindable]
+			[Embed(source="../../../../../icons/nextPage.png")]
+			protected var nextPageIcon:Class;			
+
+			[Bindable]
+			[Embed(source="../../../../../icons/previousPage.png")]
+			protected var previousPageIcon:Class;
+			
+			//--------------------LANGUAGE VARS-------------------------
+			protected var language:String = "";
+			[Bindable] 
+			protected var currentLanguage:XML = new XML();
+			//-------------------------------------------------------------
+						
+			/**
+			 *  On creation complete
+			 */
+			private function onCreationComplete():void{
+				this.setSpanishValues();
+				
+				this.setNumberOfPages(1);
+				this.setCurrentPage(1);				
+			}
+			
+			//----------------------------------------------------------------------------------
+			//-----------------------------LANGUAGE FUNCTIONS-----------------------------------
+			//----------------------------------------------------------------------------------
+			/**
+			 * 	Set English values
+			 */			
+			public function setEnglishValues():void{
+				this.language = "English";
+				this.currentLanguage = this.languagesXML.english[0];
+			}
+			/**
+			 * 	Set Spanish values
+			 */	
+			public function setSpanishValues():void{
+				this.language = "Spanish";
+				this.currentLanguage = this.languagesXML.spanish[0];						
+			}
+			/**
+			 * 	Set language
+			 */
+			public function setLanguage(lang:String):void{
+				this.language = lang;
+			}
+			/**
+			 * 	Get language
+			 */
+			public function getLanguage():String{
+				return this.language;
+			}			
+			//----------------------------------------------------------------------------------
+			//----------------------------------------------------------------------------------
+			
+			/**
+			 * 	On current page text input change
+			 
+			private function onCurrentPageTextInputChange():void{
+				//setCurrentPage(parseInt(currentPageTextInput.text));
+			}*/
+			
+			//---------------------------SETTERS-------------------------------
+			
+			/**
+			 * Updates the component enabling/disabling the buttons depending on the number page number
+			 * @param value Current page
+			 */
+			public function setCurrentPage(value:Number):void{
+				currentPageLabel.text = value.toString();
+				currentPage = value;
+				
+				if(numberOfPages <= 1){
+					nextPageButton.enabled = false;
+					previousPageButton.enabled = false;
+					lastPageButton.enabled = false;
+					firstPageButton.enabled = false;
+				}else{
+					if(currentPage == numberOfPages){
+						nextPageButton.enabled = false;
+						lastPageButton.enabled = false;	
+						firstPageButton.enabled = true;
+						previousPageButton.enabled = true;					
+					}else if(currentPage == 1){
+						nextPageButton.enabled = true;
+						lastPageButton.enabled = true;	
+						firstPageButton.enabled = false;
+						previousPageButton.enabled = false;
+					}else{
+						nextPageButton.enabled = true;
+						lastPageButton.enabled = true;	
+						firstPageButton.enabled = true;
+						previousPageButton.enabled = true;
+					}
+				}
+						
+			}
+			/**
+			 * 	Specifies how many pages are managed by the component
+			 *	@param value Total number of pages
+			 */
+			public function setNumberOfPages(value:Number):void{
+				numberOfPages = value;
+				numberOfPagesLabel.text = value.toString();
+			}
+			//-----------------------------------------------------------------
+			
+			//---------------------------BUTTONS CLICK EVENT----------------------------
+			private function onFirstPageButtonClick():void{
+				if(firstPageButton.enabled){
+					this.dispatchEvent(new PaginationControlEvent(PaginationControlEvent.GO_TO_FIRST_PAGE,0,true));
+					this.setCurrentPage(1);
+				}				
+			}
+			private function onPreviousPageButtonClick():void{
+				if(previousPageButton.enabled){
+					this.dispatchEvent(new PaginationControlEvent(PaginationControlEvent.GO_TO_PAGE,this.currentPage-1,true));
+					this.setCurrentPage(this.currentPage-1);
+				}				
+			}
+			private function onNextPageButtonClick():void{
+				if(nextPageButton.enabled){
+					this.dispatchEvent(new PaginationControlEvent(PaginationControlEvent.GO_TO_PAGE,this.currentPage+1,true));
+					this.setCurrentPage(this.currentPage+1);
+				}				
+			}
+			private function onLastPageButtonClick():void{
+				if(lastPageButton.enabled){
+					this.dispatchEvent(new PaginationControlEvent(PaginationControlEvent.GO_TO_LAST_PAGE,this.numberOfPages,true));
+					this.setCurrentPage(this.numberOfPages);
+				}				
+			}			
+			//--------------------------------------------------------------------------
+		]]>
+	</mx:Script>
+	<mx:Image id="firstPageButton" click="onFirstPageButtonClick()" source="{firstPageIcon}" 		
+		useHandCursor="{firstPageButton.enabled}" mouseChildren="{!firstPageButton.enabled}" 
+		buttonMode="{firstPageButton.enabled}" toolTip="{this.currentLanguage.buttons.first_page.tooltip}"/>
+	<mx:Image id="previousPageButton" click="onPreviousPageButtonClick()" source="{previousPageIcon}" 		
+		useHandCursor="{previousPageButton.enabled}" mouseChildren="{!previousPageButton.enabled}" 
+		buttonMode="{previousPageButton.enabled}" toolTip="{this.currentLanguage.buttons.previous_page.tooltip}"/>
+	<mx:Label id="currentPageLabel" />
+	<mx:Label text="/" width="11"/>
+	<mx:Label id="numberOfPagesLabel"/>
+	<mx:Image id="nextPageButton" click="onNextPageButtonClick()" source="{nextPageIcon}" 		
+		useHandCursor="{nextPageButton.enabled}" mouseChildren="{!nextPageButton.enabled}" 
+		buttonMode="{nextPageButton.enabled}" toolTip="{this.currentLanguage.buttons.next_page.tooltip}"/>
+	<mx:Image id="lastPageButton" click="onLastPageButtonClick()" source="{lastPageIcon}" 		
+		useHandCursor="{lastPageButton.enabled}" mouseChildren="{!lastPageButton.enabled}" 
+		buttonMode="{lastPageButton.enabled}" toolTip="{this.currentLanguage.buttons.last_page.tooltip}"/>
+	
+</mx:HBox>

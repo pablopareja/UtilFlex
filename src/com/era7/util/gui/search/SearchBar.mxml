@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" verticalAlign="middle" 
+	horizontalGap="5" paddingTop="5" paddingRight="5" paddingLeft="5" 
+	paddingBottom="5" initialize="onInitialize()">
+	<mx:states>
+		<mx:State name="SearchState">
+			<mx:AddChild position="lastChild">
+				<mx:Label text="(" 
+						  width="8" 
+						  id="label1"
+						  color="#000000"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:Label fontWeight="bold" 
+						  id="currentResultLabel" 
+						  text="{this.currentResult}"
+						  color="#000000"/>
+			</mx:AddChild>
+			<mx:SetStyle name="horizontalGap" value="0"/>
+			<mx:AddChild relativeTo="{searchButton}" position="before">
+				<mx:Spacer width="5"/>
+			</mx:AddChild>
+			<mx:AddChild relativeTo="{label1}" position="before">
+				<mx:Spacer width="5"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:Label text="/" 
+						  width="8"
+						  color="#000000"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:Label id="resultsNumberLabel" text="{this.numberOfResults}"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:Label text=")" 
+						  width="8"
+						  color="#000000"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:Image id="previousResultButton" source="{previousResultIcon}"
+					toolTip="Anterior" click="previousResult()"
+					useHandCursor="true" buttonMode="true" mouseChildren="false"/>
+			</mx:AddChild> 
+			<mx:AddChild relativeTo="{previousResultButton}" position="before">
+				<mx:Spacer width="5"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:Spacer width="5" id="spacer1"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:Image id="nextResultButton" source="{nextResultIcon}"
+					toolTip="Siguiente" click="nextResult()"
+					useHandCursor="true" buttonMode="true" mouseChildren="false"/>
+			</mx:AddChild>
+		</mx:State>
+	</mx:states>
+	<mx:Script>
+		<![CDATA[
+			import com.era7.util.events.SearchBarEvent;
+			
+			
+			
+			//---------STATES----------
+			public static const BASE_STATE:String = "";
+			public static const SEARCH_STATE:String = "SearchState";
+			
+			
+			protected var results:Array = null;
+			
+			[Bindable]
+			protected var currentResult:int = 0;
+			[Bindable]
+			protected var numberOfResults:int = 0;
+			
+			[Bindable]
+			public var nextResultIcon:Class;
+			[Bindable]
+			public var previousResultIcon:Class;
+			[Bindable]
+			public var searchIcon:Class;
+			
+			
+			
+			protected function onInitialize():void{
+				results = null;
+			}
+			
+			protected function search():void{
+				dispatchEvent(new SearchBarEvent(SearchBarEvent.SEARCH,searchTextInput.text,true));
+			}
+			
+			
+			protected function onTextInputChange():void{
+				if(currentState != BASE_STATE){
+					currentState = BASE_STATE;
+				}
+			}
+			
+			protected function previousResult():void{
+				if(previousResultButton.enabled){
+					currentResult = currentResult - 1;
+					updateButtonsAvailability();
+					var tempEvent:SearchBarEvent = new SearchBarEvent(SearchBarEvent.GO_TO_ELEMENT,results[currentResult-1],true);
+					dispatchEvent(tempEvent);
+				}				
+			}
+			
+			protected function nextResult():void{
+				if(nextResultButton.enabled){
+					currentResult = currentResult + 1;
+					updateButtonsAvailability();
+					var tempEvent:SearchBarEvent = new SearchBarEvent(SearchBarEvent.GO_TO_ELEMENT,results[currentResult-1],true);
+					dispatchEvent(tempEvent);
+				}				
+			}
+			
+			public function setResults(array:Array):void{
+				results = array;
+				
+				if(results == null){
+					numberOfResults = 0;
+					currentResult = 0;
+				}else if(results.length == 0){
+					numberOfResults = 0;
+					currentResult = 0;
+				}else{				
+					
+					currentResult = 1;
+					numberOfResults = array.length;
+					
+					var tempEvent:SearchBarEvent = new SearchBarEvent(SearchBarEvent.GO_TO_ELEMENT,results[0],true);					
+					dispatchEvent(tempEvent);
+					
+				}
+				
+				currentState = SEARCH_STATE;
+				
+				updateButtonsAvailability();
+			}
+			
+			public function getResults():Array{
+				return results;
+			}
+			
+			private function updateButtonsAvailability():void{
+				if(numberOfResults == 0){
+					previousResultButton.enabled = false;
+					nextResultButton.enabled = false;
+				}else{
+					if(currentResult >= numberOfResults){
+						nextResultButton.enabled = false;						
+					}else{
+						nextResultButton.enabled = true;	
+					}
+					if(currentResult <= 1){
+						previousResultButton.enabled = false;						
+					}else{
+						previousResultButton.enabled = true;	
+					}
+				}				
+			}
+			
+			
+		]]>
+	</mx:Script>
+	<mx:Label text="Search:" fontWeight="bold"/>
+	<mx:TextInput id="searchTextInput" 
+				  enter="search()" 
+				  change="onTextInputChange()" 
+				  width="100%" 
+				  color="#000000"/>
+	<mx:Image source="{searchIcon}" id="searchButton"
+		useHandCursor="true" buttonMode="true" mouseChildren="false"
+		click="search()"/>	
+</mx:HBox>
